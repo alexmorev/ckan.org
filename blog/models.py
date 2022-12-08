@@ -29,6 +29,7 @@ from modelcluster.fields import ParentalKey
 from taggit.models import TaggedItemBase
 
 from .blocks import ImageWithCaption
+from wagtailcodeblock.blocks import CodeBlock
 
 import events
 
@@ -93,6 +94,7 @@ class Profile(models.Model):
     panels = [
         MultiFieldPanel(
             [
+                FieldPanel('user'),
                 FieldPanel('bio'),
                 FieldPanel('company'),
                 FieldPanel('location'),
@@ -212,7 +214,7 @@ class BlogListingPage(MetadataPageMixin, Page):
             ).filter(featured=True).order_by('-created')
         featured_post = featured_posts[0] if featured_posts else all_posts[0]
         context['featured_post'] = featured_post
-        context['categories'] = PostCategoryPage.objects.all().order_by('-category_title')
+        context['categories'] = PostCategoryPage.objects.all().order_by('category_title')
         all_posts = all_posts.exclude(id__in=[featured_post.id,])
         paginator = Paginator(all_posts, self.posts_per_page)
         page = request.GET.get('page')
@@ -295,8 +297,10 @@ class BlogPostPage(MetadataPageMixin, Page):
         ('paragraph', blocks.RichTextBlock(
             features=[
                 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
-                'bold', 'italic', 'link', 'ol', 'ul', 'hr'
+                'bold', 'italic', 'link', 'ol', 'ul', 'hr', 'image',
+                'code', 'blockquote',
             ])),
+        ('code', CodeBlock(label='Code')),
         ('post_image', ImageWithCaption()),
     ],
     null=True,
