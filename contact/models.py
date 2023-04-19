@@ -18,7 +18,6 @@ from wagtail.admin.edit_handlers import FieldPanel, InlinePanel, PageChooserPane
 from wagtailcache.cache import WagtailCacheMixin
 
 from managers.models import Manager
-from wagtailcaptcha.models import WagtailCaptchaEmailForm
 
 import mailchimp_marketing as MailchimpMarketing
 from mailchimp_marketing.api_client import ApiClientError
@@ -111,7 +110,7 @@ def send_contact_info(request, member_info:dict):
             print("An exception occurred: {}".format(error.text))
 
 
-class ContactPage(WagtailCacheMixin, WagtailCaptchaEmailForm):
+class ContactPage(WagtailCacheMixin, AbstractEmailForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -121,7 +120,7 @@ class ContactPage(WagtailCacheMixin, WagtailCaptchaEmailForm):
     template = 'contact/contact_page.html'
     landing_page_template = 'contact/contact_page_landing.html'
     subpage_types =[]
-    max_count = 2
+    max_count = 5
     cache_control = 'no-cache'
 
     form_name = models.CharField(
@@ -132,8 +131,10 @@ class ContactPage(WagtailCacheMixin, WagtailCaptchaEmailForm):
         features=['h2', 'h3', 'h4', 'h5', 'h6', 'bold', 'italic', 'link', 'superscript', 'subscript'],
         blank=True,
     )
-    thank_you_text = RichTextField(
+    thank_you_text = models.TextField(
         blank=True,
+        null=True,
+        help_text='Use HTML tags for text design.',
     )
     button_text = models.CharField(
         max_length = 50,
